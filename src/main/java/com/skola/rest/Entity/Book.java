@@ -3,7 +3,6 @@ package com.skola.rest.Entity;
 import java.util.UUID;
 
 public class Book {
-
     private String nameOfBook;
     private UUID uuid;
     private boolean isTaken;
@@ -32,7 +31,6 @@ public class Book {
         this.takenByUserWithId = takenByUserWithId;
     }
 
-
     public UUID getUuid() {
         return uuid;
     }
@@ -48,6 +46,4 @@ public class Book {
     public void setNameOfBook(String name) {
         this.nameOfBook = name;
     }
-
-
 }

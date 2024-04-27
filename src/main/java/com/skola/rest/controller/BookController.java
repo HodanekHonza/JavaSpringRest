@@ -13,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/book")
 public class BookController {
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<String> createBook(@RequestBody Book book) {
         UUID uuid = UUID.randomUUID();
         for (Map.Entry<UUID, Book> entry : Database.bookHashMap.entrySet()) {
@@ -24,11 +24,11 @@ public class BookController {
         }
         book.setUuid(uuid);
         Database.bookHashMap.put(uuid, book);
-        System.out.println("Book name: " + book.getNameOfBook());
+        System.out.println(book);
         return new ResponseEntity<>("SUCCESSFUL CREATE - name of book: " + book.getNameOfBook(), HttpStatus.OK);
     }
 
-    @GetMapping("/get")
+    @GetMapping()
     public ResponseEntity<String> getUser(@RequestParam(value = "name") String name) {
         for (Map.Entry<UUID, Book> entry : Database.bookHashMap.entrySet()) {
             Book book = entry.getValue();
@@ -40,7 +40,7 @@ public class BookController {
         return new ResponseEntity<>("Book not found", HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/update")
+    @PutMapping()
     public ResponseEntity<String> updateBook(@RequestParam(value = "name") String name,
                                              @RequestParam(value = "isTaken") boolean isTaken,
                                              @RequestParam(value = "isTakenByUserId") UUID isTakenByUserId) {
@@ -68,5 +68,18 @@ public class BookController {
         return new ResponseEntity<>("Book not found", HttpStatus.NOT_FOUND);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<String> deleteBook(@RequestParam(value = "name") String name) {
+        for (Map.Entry<UUID, Book> entry : Database.bookHashMap.entrySet()) {
+            Book book = entry.getValue();
+            if (name.equals(book.getNameOfBook())) {
+                Database.bookHashMap.remove(book.getUuid());
+                System.out.println(Database.bookHashMap);
+                return new ResponseEntity<>("Book successfully deleted", HttpStatus.OK);
+
+            }
+        }
+        return new ResponseEntity<>("Book not found", HttpStatus.NOT_FOUND);
+    }
 
 }

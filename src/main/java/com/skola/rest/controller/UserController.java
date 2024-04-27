@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.skola.rest.Entity.User;
 import com.skola.rest.Database;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @RequestMapping(value = "/user")
 public class UserController {
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<String> createUser(@RequestBody User user) {
         UUID uuid = UUID.randomUUID();
         for (Map.Entry<UUID, User> entry : Database.userHashMap.entrySet()) {
@@ -26,17 +27,50 @@ public class UserController {
         }
         user.setUuid(uuid);
         Database.userHashMap.put(uuid, user);
+        System.out.println(Database.userHashMap);
         System.out.println("User email: " + user.getEmail());
         return new ResponseEntity<>("USER EMAIL: " + user.getEmail(), HttpStatus.OK);
     }
 
-    @GetMapping("/get")
+    @GetMapping()
     public ResponseEntity<String> getUser(@RequestParam(value = "email") String email) {
         for (Map.Entry<UUID, User> entry : Database.userHashMap.entrySet()) {
             User user = entry.getValue();
             if (user != null && user.getEmail().equals(email)) {
                 return new ResponseEntity<>("User email: " + user.getEmail() + "  UserUUID: " + user.getUuid(), HttpStatus.OK);
             }
+        }
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping()
+    public ResponseEntity<String> updateUser(@RequestParam(value = "oldEmail") String oldEmail, @RequestBody User user) {
+
+        for (Map.Entry<UUID, User> entry : Database.userHashMap.entrySet()) {
+            User userValue = entry.getValue();
+
+            if (userValue.getEmail().equals(oldEmail)) {
+                user.setUuid(userValue.getUuid());
+                Database.userHashMap.put(userValue.getUuid(), user);
+                System.out.println(user.getEmail());
+                System.out.println(user.getPassword());
+                return new ResponseEntity<>("User successfully Updated", HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
+
+
+    @DeleteMapping()
+    public ResponseEntity<String> deleteUser(@RequestParam(value = "email") String email) {
+        for (Map.Entry<UUID, User> entry : Database.userHashMap.entrySet()) {
+            User user = entry.getValue();
+            if (user != null && user.getEmail().equals(email)) {
+                Database.userHashMap.remove(user.getUuid());
+                System.out.println(Database.userHashMap);
+                return new ResponseEntity<>("User deleted", HttpStatus.OK);
+            }
+
         }
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
     }
