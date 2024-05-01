@@ -2,6 +2,8 @@
 
 ## Introduction
 
+
+
 This Java Spring project is currently in development and follows the controller pattern. We've recently implemented controller and entity (DTO) functionalities. However, it's important to note that we haven't yet incorporated interfaces, which will be part of the upcoming refactor, along with the implementation of DAO, DTO, service, and repository layers.
 
 ## Project Structure
