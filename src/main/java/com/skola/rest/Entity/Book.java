@@ -1,15 +1,20 @@
 package com.skola.rest.Entity;
 
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Book {
     private String nameOfBook;
     private UUID uuid;
     private boolean isTaken;
     private UUID takenByUserWithId;
-
-    public Book() {
-    }
 
     public Book(String nameOfBook) {
         this.nameOfBook = nameOfBook;
