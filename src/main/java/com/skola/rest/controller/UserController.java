@@ -1,14 +1,9 @@
 package com.skola.rest.controller;
 
-import com.skola.rest.Entity.Book;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.skola.rest.Entity.User;
-import com.skola.rest.Database;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
