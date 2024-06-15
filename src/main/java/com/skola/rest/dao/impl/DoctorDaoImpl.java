@@ -4,13 +4,14 @@ import com.skola.rest.dao.DoctorDao;
 import com.skola.rest.Entity.Doctor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
-@Repository
+@Component
 public class DoctorDaoImpl implements DoctorDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -19,47 +20,64 @@ public class DoctorDaoImpl implements DoctorDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private RowMapper<Doctor> rowMapper = new RowMapper<Doctor>() {
-        @Override
-        public Doctor mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Doctor doctor = new Doctor();
-            doctor.setDoctorId(rs.getLong("doctor_id"));
-            doctor.setFirstName(rs.getString("first_name"));
-            doctor.setLastName(rs.getString("last_name"));
-            doctor.setSpecialty(rs.getString("specialty"));
-            doctor.setPhoneNumber(rs.getString("phone_number"));
-            doctor.setEmail(rs.getString("email"));
-            return doctor;
-        }
-    };
+    @Override
+    public int save(Doctor doctor) {
+        return jdbcTemplate.update(
+                "INSERT INTO doctor (first_name, last_name, specialty, phone_number, email) " +
+                        "VALUES (?, ?, ?, ?, ?)",
+                doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(),
+                doctor.getPhoneNumber(), doctor.getEmail()
+        );
+    }
+
+    @Override
+    public Doctor findById(Long doctorId) {
+        List<Doctor> results = jdbcTemplate.query(
+                "SELECT doctor_id, first_name, last_name, specialty, phone_number, email " +
+                        "FROM doctor WHERE doctor_id = ? LIMIT 1",
+                new DoctorRowMapper(), doctorId);
+
+        return results.isEmpty() ? null : results.get(0);
+    }
 
     @Override
     public List<Doctor> findAll() {
-        String sql = "SELECT * FROM doctor";
-        return jdbcTemplate.query(sql, rowMapper);
-    }
-
-    @Override
-    public Doctor findById(Long id) {
-        String sql = "SELECT * FROM doctor WHERE doctor_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, rowMapper);
-    }
-
-    @Override
-    public int save(Doctor doctor) {
-        String sql = "INSERT INTO doctor (first_name, last_name, specialty, phone_number, email) VALUES (?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(), doctor.getPhoneNumber(), doctor.getEmail());
+        return jdbcTemplate.query(
+                "SELECT doctor_id, first_name, last_name, specialty, phone_number, email " +
+                        "FROM doctor",
+                new DoctorRowMapper()
+        );
     }
 
     @Override
     public int update(Doctor doctor) {
-        String sql = "UPDATE doctor SET first_name = ?, last_name = ?, specialty = ?, phone_number = ?, email = ? WHERE doctor_id = ?";
-        return jdbcTemplate.update(sql, doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(), doctor.getPhoneNumber(), doctor.getEmail(), doctor.getDoctorId());
+        return jdbcTemplate.update(
+                "UPDATE doctor SET first_name = ?, last_name = ?, specialty = ?, " +
+                        "phone_number = ?, email = ? WHERE doctor_id = ?",
+                doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(),
+                doctor.getPhoneNumber(), doctor.getEmail(), doctor.getDoctorId()
+        );
     }
 
     @Override
-    public int deleteById(Long id) {
-        String sql = "DELETE FROM doctor WHERE doctor_id = ?";
-        return jdbcTemplate.update(sql, id);
+    public int deleteById(Long doctorId) {
+        return jdbcTemplate.update(
+                "DELETE FROM doctor WHERE doctor_id = ?",
+                doctorId
+        );
+    }
+
+    public static class DoctorRowMapper implements RowMapper<Doctor> {
+        @Override
+        public Doctor mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return Doctor.builder()
+                    .doctorId(rs.getLong("doctor_id"))
+                    .firstName(rs.getString("first_name"))
+                    .lastName(rs.getString("last_name"))
+                    .specialty(rs.getString("specialty"))
+                    .phoneNumber(rs.getString("phone_number"))
+                    .email(rs.getString("email"))
+                    .build();
+        }
     }
 }

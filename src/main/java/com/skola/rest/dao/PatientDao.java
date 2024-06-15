@@ -1,6 +1,7 @@
 package com.skola.rest.dao;
 
 import com.skola.rest.Entity.Patient;
+
 import java.util.List;
 
 public interface PatientDao {
