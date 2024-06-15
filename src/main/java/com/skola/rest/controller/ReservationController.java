@@ -39,16 +39,49 @@ public class ReservationController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
-        int result = reservationDao.save(reservation);
-        if (result > 0) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+//    @PostMapping
+//    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
+//        int result = reservationDao.save(reservation);
+//        if (result > 0) {
+//            return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+//
+@PostMapping
+public ResponseEntity<?> createReservation(@RequestBody Reservation reservation) {
+    // Check if the doctor is available for the requested time slot
+    if (!isDoctorAvailable(reservation.getDoctorId(), reservation.getReservationDate(),
+            reservation.getStartTime(), reservation.getEndTime())) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Doctor is not available at the requested time slot.");
     }
 
+    int result = reservationDao.save(reservation);
+    if (result > 0) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
+    } else {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+}
+
+    // Helper method to check if the doctor is available for the given time slot
+    private boolean isDoctorAvailable(Long doctorId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime) {
+        List<Reservation> existingReservations = reservationDao.findByDoctorAndDate(doctorId, reservationDate);
+
+        for (Reservation existingReservation : existingReservations) {
+            LocalTime existingStartTime = existingReservation.getStartTime();
+            LocalTime existingEndTime = existingReservation.getEndTime();
+
+            // Check if there's an overlap in time
+            if (!(endTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime))) {
+                return false; // There's an overlap, doctor is not available
+            }
+        }
+
+        return true; // No overlap found, doctor is available
+    }
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservation) {
         reservation.setReservationId(id); // Ensure the ID is set for update
@@ -76,13 +109,5 @@ public class ReservationController {
         LocalDate localDate = LocalDate.parse(date); // Parse date string into LocalDate
         List<Reservation> reservations = reservationDao.findByDoctorAndDate(doctorId, localDate);
         return ResponseEntity.ok(reservations);
-    }
-    @GetMapping("/hall/{hallId}/available-times/{date}")
-    public ResponseEntity<List<Reservation>> getAvailableTimesForHall(
-            @PathVariable Long hallId,
-            @PathVariable String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        List<Reservation> availableTimes = reservationDao.getAvailableReservationTimes(hallId, localDate);
-        return ResponseEntity.ok(availableTimes);
     }
 }

@@ -61,6 +61,17 @@ INSERT INTO patient (first_name, last_name)
 VALUES ('Alice', 'Johnson'),
        ('Bob', 'Brown');
 
+-- Insert reservations for today's date with 1-hour duration and adjusted cleaning times
 INSERT INTO reservation (doctor_id, patient_id, hall_id, reservation_date, start_time, end_time, description, status)
-VALUES (1, 1, 1, '2024-06-20', '10:00:00', '11:00:00', 'Regular checkup', 'Scheduled'),
-       (2, 2, 2, '2024-06-21', '14:00:00', '15:00:00', 'Neurological assessment', 'Scheduled');
+VALUES
+    (1, 1, 1, '2024-06-15', '08:00:00', '09:00:00', 'Consultation', 'Scheduled'),
+    (1, 2, 1, '2024-06-15', '09:30:00', '10:30:00', 'Follow-up', 'Scheduled'),
+    (1, 1, 1, '2024-06-15', '11:30:00', '12:30:00', 'Routine check', 'Scheduled'),
+    (1, 2, 1, '2024-06-15', '13:30:00', '14:30:00', 'Health check', 'Scheduled'),
+    (1, 1, 1, '2024-06-15', '15:30:00', '16:30:00', 'Diagnosis review', 'Scheduled'),
+
+    (2, 1, 2, '2024-06-15', '08:00:00', '09:00:00', 'Consultation', 'Scheduled'),
+    (2, 2, 2, '2024-06-15', '09:30:00', '10:30:00', 'Neurological assessment', 'Scheduled'),
+    (2, 1, 2, '2024-06-15', '11:30:00', '12:30:00', 'Routine check', 'Scheduled'),
+    (2, 2, 2, '2024-06-15', '13:30:00', '14:30:00', 'Health check', 'Scheduled'),
+    (2, 1, 2, '2024-06-15', '15:30:00', '16:30:00', 'Follow-up', 'Scheduled');
