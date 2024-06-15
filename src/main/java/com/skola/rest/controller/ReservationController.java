@@ -3,10 +3,13 @@ package com.skola.rest.controller;
 import com.skola.rest.dao.impl.ReservationDaoImpl;
 import com.skola.rest.Entity.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -65,5 +68,21 @@ public class ReservationController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    @GetMapping("/doctor")
+    public ResponseEntity<List<Reservation>> getReservationsByDoctorAndDate(
+            @RequestParam Long doctorId,
+            @RequestParam String date) {
+        LocalDate localDate = LocalDate.parse(date); // Parse date string into LocalDate
+        List<Reservation> reservations = reservationDao.findByDoctorAndDate(doctorId, localDate);
+        return ResponseEntity.ok(reservations);
+    }
+    @GetMapping("/hall/{hallId}/available-times/{date}")
+    public ResponseEntity<List<Reservation>> getAvailableTimesForHall(
+            @PathVariable Long hallId,
+            @PathVariable String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        List<Reservation> availableTimes = reservationDao.getAvailableReservationTimes(hallId, localDate);
+        return ResponseEntity.ok(availableTimes);
     }
 }

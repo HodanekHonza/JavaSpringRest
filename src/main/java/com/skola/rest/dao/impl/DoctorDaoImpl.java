@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class DoctorDaoImpl implements DoctorDao {
@@ -23,17 +22,17 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public int save(Doctor doctor) {
         return jdbcTemplate.update(
-                "INSERT INTO doctor (first_name, last_name, specialty, phone_number, email) " +
-                        "VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO doctor (first_name, last_name, specialty, email) " +
+                        "VALUES (?, ?, ?, ?)",
                 doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(),
-                doctor.getPhoneNumber(), doctor.getEmail()
+                doctor.getEmail()
         );
     }
 
     @Override
     public Doctor findById(Long doctorId) {
         List<Doctor> results = jdbcTemplate.query(
-                "SELECT doctor_id, first_name, last_name, specialty, phone_number, email " +
+                "SELECT doctor_id, first_name, last_name, specialty, email " +
                         "FROM doctor WHERE doctor_id = ? LIMIT 1",
                 new DoctorRowMapper(), doctorId);
 
@@ -43,7 +42,7 @@ public class DoctorDaoImpl implements DoctorDao {
     @Override
     public List<Doctor> findAll() {
         return jdbcTemplate.query(
-                "SELECT doctor_id, first_name, last_name, specialty, phone_number, email " +
+                "SELECT doctor_id, first_name, last_name, specialty, email " +
                         "FROM doctor",
                 new DoctorRowMapper()
         );
@@ -53,9 +52,9 @@ public class DoctorDaoImpl implements DoctorDao {
     public int update(Doctor doctor) {
         return jdbcTemplate.update(
                 "UPDATE doctor SET first_name = ?, last_name = ?, specialty = ?, " +
-                        "phone_number = ?, email = ? WHERE doctor_id = ?",
+                        "email = ? WHERE doctor_id = ?",
                 doctor.getFirstName(), doctor.getLastName(), doctor.getSpecialty(),
-                doctor.getPhoneNumber(), doctor.getEmail(), doctor.getDoctorId()
+                doctor.getEmail(), doctor.getDoctorId()
         );
     }
 
@@ -75,9 +74,9 @@ public class DoctorDaoImpl implements DoctorDao {
                     .firstName(rs.getString("first_name"))
                     .lastName(rs.getString("last_name"))
                     .specialty(rs.getString("specialty"))
-                    .phoneNumber(rs.getString("phone_number"))
                     .email(rs.getString("email"))
                     .build();
         }
     }
+
 }
