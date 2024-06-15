@@ -1,27 +1,27 @@
-package com.skola.rest.controller;
+package com.skola.rest.services;
 
-import com.skola.rest.dao.impl.ReservationDaoImpl;
 import com.skola.rest.Entity.Reservation;
+import com.skola.rest.dao.impl.ReservationDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
-@RestController
-@RequestMapping("/api/reservations")
-public class ReservationController {
+@Service
+public class ReservationService {
 
     private final ReservationDaoImpl reservationDao;
 
     @Autowired
-    public ReservationController(ReservationDaoImpl reservationDao) {
+    public ReservationService(ReservationDaoImpl reservationDao) {
         this.reservationDao = reservationDao;
     }
+
+
 
     @GetMapping
     public ResponseEntity<List<Reservation>> getAllReservations() {
@@ -40,21 +40,21 @@ public class ReservationController {
     }
 
 
-public ResponseEntity<?> createReservation(@RequestBody Reservation reservation) {
-    // Check if the doctor is available for the requested time slot
-    if (!isDoctorAvailable(reservation.getDoctorId(), reservation.getReservationDate(),
-            reservation.getStartTime(), reservation.getEndTime())) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Doctor is not available at the requested time slot.");
-    }
+    public ResponseEntity<?> createReservation(Reservation reservation) {
+        // Check if the doctor is available for the requested time slot
+        if (!isDoctorAvailable(reservation.getDoctorId(), reservation.getReservationDate(),
+                reservation.getStartTime(), reservation.getEndTime())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Doctor is not available at the requested time slot.");
+        }
 
-    int result = reservationDao.save(reservation);
-    if (result > 0) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
-    } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        int result = reservationDao.save(reservation);
+        if (result > 0) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-}
 
     // Helper method to check if the doctor is available for the given time slot
     private boolean isDoctorAvailable(Long doctorId, LocalDate reservationDate, LocalTime startTime, LocalTime endTime) {
@@ -72,8 +72,7 @@ public ResponseEntity<?> createReservation(@RequestBody Reservation reservation)
 
         return true; // No overlap found, doctor is available
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id, @RequestBody Reservation reservation) {
+    public ResponseEntity<Reservation> updateReservation(Long id, Reservation reservation) {
         reservation.setReservationId(id);
         int result = reservationDao.update(reservation);
         if (result > 0) {
@@ -83,8 +82,7 @@ public ResponseEntity<?> createReservation(@RequestBody Reservation reservation)
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteReservation(Long id) {
         int result = reservationDao.deleteById(id);
         if (result > 0) {
             return ResponseEntity.noContent().build();
@@ -92,13 +90,16 @@ public ResponseEntity<?> createReservation(@RequestBody Reservation reservation)
             return ResponseEntity.notFound().build();
         }
     }
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/doctor")
     public ResponseEntity<List<Reservation>> getReservationsByDoctorAndDate(
-            @RequestParam Long doctorId,
-            @RequestParam String date) {
+            Long doctorId,
+            String date) {
         LocalDate localDate = LocalDate.parse(date); // Parse date string into LocalDate
         List<Reservation> reservations = reservationDao.findByDoctorAndDate(doctorId, localDate);
         return ResponseEntity.ok(reservations);
     }
 }
+
+
+
+
+

@@ -85,35 +85,6 @@ public class ReservationDaoImpl implements ReservationDao {
         );
     }
 
-    public List<Reservation> getAvailableReservationTimes(Long hallId, LocalDate date) {
-        // Fetch existing reservations for the given hall and date
-        return jdbcTemplate.query(
-                "SELECT start_time, end_time FROM reservation WHERE hall_id = ? AND reservation_date = ?",
-                new ReservationRowMapper(), hallId, date
-        );
-//
-//        // Calculate available times based on existing reservations
-//        List<LocalTime> availableTimes = new ArrayList<>();
-//        LocalTime startTime = LocalTime.of(8, 0);  // Start time of working hours
-//        LocalTime endTime = LocalTime.of(17, 0);   // End time of working hours
-//        LocalTime currentStartTime = startTime;
-//
-//        for (Reservation reservation : reservations) {
-//            if (currentStartTime.isBefore(reservation.getStartTime())) {
-//                availableTimes.add(currentStartTime);
-//                availableTimes.add(reservation.getStartTime());
-//            }
-//            currentStartTime = reservation.getEndTime();
-//        }
-//
-//        if (currentStartTime.isBefore(endTime)) {
-//            availableTimes.add(currentStartTime);
-//            availableTimes.add(endTime);
-//        }
-//
-//        return availableTimes;
-    }
-
     public static class ReservationRowMapper implements RowMapper<Reservation> {
         @Override
         public Reservation mapRow(ResultSet rs, int rowNum) throws SQLException {

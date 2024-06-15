@@ -36,6 +36,17 @@ public class PatientController {
         }
     }
 
+
+    @GetMapping("/name/{id}")
+    public ResponseEntity<Patient> getPatientByName(@PathVariable String id) {
+        Patient patient = patientDao.findByName(id);
+        if (patient != null) {
+            return ResponseEntity.ok(patient);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
         int result = patientDao.save(patient);

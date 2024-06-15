@@ -37,6 +37,14 @@ public class PatientDaoImpl implements PatientDao {
         return results.isEmpty() ? null : results.get(0);
     }
 
+    public Patient findByName(String patientName) {
+        List<Patient> results = jdbcTemplate.query(
+                "SELECT patient_id, first_name, last_name FROM patient WHERE last_name = ? LIMIT 1",
+                new PatientRowMapper(), patientName);
+
+        return results.isEmpty() ? null : results.get(0);
+    }
+
     @Override
     public List<Patient> findAll() {
         return jdbcTemplate.query(
